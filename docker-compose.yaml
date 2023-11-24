@@ -1,0 +1,10 @@
+version: '3.7'
+services:
+  db:
+    image: postgres:15.5-alpine3.18
+    environment:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_pass
+      POSTGRES_DB: test
+    ports:
+      - 5447:5432
