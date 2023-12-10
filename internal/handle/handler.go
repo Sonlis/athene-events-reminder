@@ -8,6 +8,7 @@ import (
 	"github.com/Sonlis/athene-events-notifier/internal/event"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	pgx "github.com/jackc/pgx/v5"
+	"log"
 )
 
 // HandleUpdate handles incoming updates from Telegram.
@@ -18,9 +19,12 @@ func HandleUpdate(update tgbotapi.Update, bot *tgbotapi.BotAPI, db_conn *pgx.Con
 	case update.Message != nil:
 		msg, err := handleCommand(update.Message, ilmo)
 		if err != nil {
-			panic(err)
+			log.Printf("Error handling command for chatId %d and button %s: %v", update.Message.Chat.ID, update.Message.Text, err)
 		}
-		bot.Send(msg)
+		_, err = bot.Send(msg)
+		if err != nil {
+			log.Printf("Error sending message to chatId %d: %v", update.Message.Chat.ID, err)
+		}
 		break
 
 	// Handle button clicks
@@ -32,9 +36,12 @@ func HandleUpdate(update tgbotapi.Update, bot *tgbotapi.BotAPI, db_conn *pgx.Con
 
 		msg, err := handleButton(query, db_conn, ilmo)
 		if err != nil {
-			panic(err)
+			log.Printf("Error handling button press for chatId %d and button %s: %v", update.Message.Chat.ID, query.Data, err)
 		}
-		bot.Send(msg)
+		_, err = bot.Send(msg)
+		if err != nil {
+			log.Printf("Error sending message to chatId %d: %v ", update.Message.Chat.ID, err)
+		}
 		break
 	}
 }
