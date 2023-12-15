@@ -10,6 +10,7 @@ import (
 
 type Ilmo struct {
 	ApiURL string `env:"ILMO_API_URL"`
+	WebURL string `env:"ILMO_WEB_URL"`
 }
 
 type Event struct {

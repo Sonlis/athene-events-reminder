@@ -7,7 +7,7 @@ import (
 )
 
 func TestCreateReminder(t *testing.T) {
-	config, err := initTestConfig()
+	config, err := InitTestConfig()
 	if err != nil {
 		t.Errorf("Failed to initialize test config: %v", err)
 	}
@@ -31,7 +31,7 @@ func TestCreateReminder(t *testing.T) {
 }
 
 func TestRemoveReminder(t *testing.T) {
-	config, err := initTestConfig()
+	config, err := InitTestConfig()
 	if err != nil {
 		t.Errorf("Failed to initialize test config: %v", err)
 	}
@@ -61,7 +61,7 @@ func TestRemoveReminder(t *testing.T) {
 
 func TestCheckReminder(t *testing.T) {
 
-	config, err := initTestConfig()
+	config, err := InitTestConfig()
 	if err != nil {
 		t.Errorf("Failed to initialize test config: %v", err)
 	}
