@@ -10,12 +10,14 @@ import (
 
 func TestInit(t *testing.T) {
 	os.Setenv("ILMO_API_URL", "http://localhost:8080")
+	os.Setenv("ILMO_WEB_URL", "http://localhost:8080/events")
 	i, err := Init()
 	if err != nil {
 		t.Errorf("Init() failed")
 	}
 	want := Ilmo{
 		ApiURL: "http://localhost:8080",
+		WebURL: "http://localhost:8080/events",
 	}
 	if i != want {
 		t.Errorf("Init() returned %+v, want %+v", i, want)
@@ -98,7 +100,7 @@ func TestGetEvents(t *testing.T) {
 	}
 	got, err := i.GetEvents()
 	if err != nil {
-		t.Errorf("GetEvents() failed")
+		t.Errorf("GetEvents() failed: %v", err)
 	}
 	for i, event := range got {
 		if event != want[i] {

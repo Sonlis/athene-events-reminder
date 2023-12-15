@@ -12,6 +12,9 @@ var backButton = "Back"
 
 // buildEventsMarkup builds the markup structure returned when a single event is requested.
 func buildEventInfoMarkup(event event.Event, reminderSet bool) tgbotapi.InlineKeyboardMarkup {
+	// Set the reminde to be 5 minutes before the event registration starts.
+	// Also remove 2 hours to the time, because the event is in UTC+2, while the db time is in UTC.
+	reminderTime := event.RegistrationStartDate.Add(time.Duration(-5) * time.Minute).Add(time.Duration(-2) * time.Hour).Format("2006-01-02T15:04:05Z07:00")
 	if reminderSet {
 		return tgbotapi.NewInlineKeyboardMarkup(
 			tgbotapi.NewInlineKeyboardRow(
@@ -24,7 +27,7 @@ func buildEventInfoMarkup(event event.Event, reminderSet bool) tgbotapi.InlineKe
 	} else {
 		return tgbotapi.NewInlineKeyboardMarkup(
 			tgbotapi.NewInlineKeyboardRow(
-				tgbotapi.NewInlineKeyboardButtonData("Set a reminder", "setReminder "+strconv.Itoa(event.ID)+" "+event.RegistrationStartDate.Format("2006-01-02T15:04:05Z07:00")),
+				tgbotapi.NewInlineKeyboardButtonData("Set a reminder", "setReminder "+strconv.Itoa(event.ID)+" "+reminderTime),
 			),
 			tgbotapi.NewInlineKeyboardRow(
 				tgbotapi.NewInlineKeyboardButtonData(backButton, backButton+" events"),

@@ -1,25 +1,11 @@
 package db
 
 import (
-	"context"
-	"github.com/sethvargo/go-envconfig"
-	"os"
 	"testing"
 )
 
-func initTestConfig() (Config, error) {
-	var config Config
-	os.Setenv("DB_HOST", "localhost")
-	os.Setenv("DB_PORT", "5447")
-	os.Setenv("DB_USER", "test_user")
-	os.Setenv("DB_PASSWORD", "test_pass")
-	os.Setenv("DB_NAME", "test")
-	err := envconfig.Process(context.Background(), &config)
-	return config, err
-}
-
 func TestConnect(t *testing.T) {
-	config, err := initTestConfig()
+	config, err := InitTestConfig()
 	if err != nil {
 		t.Errorf("Failed to initialize test config: %v", err)
 	}
@@ -33,7 +19,7 @@ func TestConnect(t *testing.T) {
 }
 
 func TestConnString(t *testing.T) {
-	config, err := initTestConfig()
+	config, err := InitTestConfig()
 	if err != nil {
 		t.Errorf("Failed to initialize test config: %v", err)
 	}

@@ -1,14 +1,15 @@
 package main
 
 import (
-	"bufio"
 	"context"
 	"log"
 	"os"
+	"time"
 
 	"github.com/Sonlis/athene-events-notifier/internal/db"
 	"github.com/Sonlis/athene-events-notifier/internal/event"
 	"github.com/Sonlis/athene-events-notifier/internal/handle"
+	"github.com/Sonlis/athene-events-notifier/internal/notifier"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/jackc/pgx/v5"
 	"github.com/sethvargo/go-envconfig"
@@ -31,7 +32,6 @@ func main() {
 
 	// Create a new cancellable background context. Calling `cancel()` leads to the cancellation of the context
 	ctx := context.Background()
-	ctx, cancel := context.WithCancel(ctx)
 
 	// `updates` is a golang channel which receives telegram updates
 	updates := bot.GetUpdatesChan(u)
@@ -60,13 +60,22 @@ func main() {
 	// Pass cancellable context to goroutine
 	go receiveUpdates(ctx, updates, bot, db_conn, &ilmo)
 
-	// Tell the user the bot is online
-	log.Println("Start listening for updates. Press enter to stop")
+	for {
+		notifier.Notify(bot, db_conn, &ilmo)
 
-	// Wait for a newline symbol, then cancel handling updates
-	bufio.NewReader(os.Stdin).ReadBytes('\n')
-	cancel()
+		wait()
+	}
 
+}
+
+func wait() {
+	now := time.Now()
+
+	secondsUntilNextMinute := 60 - now.Second()
+
+	waitDuration := time.Second * time.Duration(secondsUntilNextMinute)
+
+	time.Sleep(waitDuration)
 }
 
 func receiveUpdates(ctx context.Context, updates tgbotapi.UpdatesChannel, bot *tgbotapi.BotAPI, db_conn *pgx.Conn, ilmo *event.Ilmo) {
