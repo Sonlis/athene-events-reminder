@@ -3,7 +3,7 @@ package event
 import (
 	"context"
 	"encoding/json"
-	"github.com/Sonlis/athene-events-notifier/internal/utils"
+	"github.com/Sonlis/athene-events-reminder/internal/utils"
 	"github.com/sethvargo/go-envconfig"
 	"time"
 )

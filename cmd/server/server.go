@@ -6,12 +6,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/Sonlis/athene-events-notifier/internal/db"
-	"github.com/Sonlis/athene-events-notifier/internal/event"
-	"github.com/Sonlis/athene-events-notifier/internal/handle"
-	"github.com/Sonlis/athene-events-notifier/internal/notifier"
+	"github.com/Sonlis/athene-events-reminder/internal/database"
+	"github.com/Sonlis/athene-events-reminder/internal/event"
+	"github.com/Sonlis/athene-events-reminder/internal/handle"
+	"github.com/Sonlis/athene-events-reminder/internal/notifier"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/jackc/pgx/v5"
 	"github.com/sethvargo/go-envconfig"
 )
 
@@ -36,12 +35,12 @@ func main() {
 	// `updates` is a golang channel which receives telegram updates
 	updates := bot.GetUpdatesChan(u)
 
-	var config db.Config
+	var config database.Config
 	if err := envconfig.Process(context.Background(), &config); err != nil {
 		log.Panic("Error processing database config: ", err)
 	}
 
-	db_conn, err := db.Connect(&config)
+	db_conn, err := database.Connect(&config)
 	if err != nil {
 		log.Panic("Error connecting to database: ", err)
 	}
@@ -78,7 +77,7 @@ func wait() {
 	time.Sleep(waitDuration)
 }
 
-func receiveUpdates(ctx context.Context, updates tgbotapi.UpdatesChannel, bot *tgbotapi.BotAPI, db_conn *pgx.Conn, ilmo *event.Ilmo) {
+func receiveUpdates(ctx context.Context, updates tgbotapi.UpdatesChannel, bot *tgbotapi.BotAPI, db_conn *database.DB, ilmo *event.Ilmo) {
 	// `for {` means the loop is infinite until we manually stop it
 	for {
 		select {

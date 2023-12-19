@@ -2,7 +2,7 @@ package handle
 
 import (
 	"fmt"
-	"github.com/Sonlis/athene-events-notifier/internal/event"
+	"github.com/Sonlis/athene-events-reminder/internal/event"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"strconv"
 	"time"

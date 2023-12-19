@@ -5,15 +5,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Sonlis/athene-events-notifier/internal/event"
+	"github.com/Sonlis/athene-events-reminder/internal/database"
+	"github.com/Sonlis/athene-events-reminder/internal/event"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	pgx "github.com/jackc/pgx/v5"
 	"log"
 )
 
 // HandleUpdate handles incoming updates from Telegram.
 // This is the entrypoint for all incoming messages.
-func HandleUpdate(update tgbotapi.Update, bot *tgbotapi.BotAPI, db_conn *pgx.Conn, ilmo *event.Ilmo) {
+func HandleUpdate(update tgbotapi.Update, bot *tgbotapi.BotAPI, db *database.DB, ilmo *event.Ilmo) {
 	switch {
 	// Handle messages
 	case update.Message != nil:
@@ -34,7 +34,7 @@ func HandleUpdate(update tgbotapi.Update, bot *tgbotapi.BotAPI, db_conn *pgx.Con
 		callbackCfg := tgbotapi.NewCallback(query.ID, "")
 		bot.Send(callbackCfg)
 
-		msg, err := handleButton(query, db_conn, ilmo)
+		msg, err := handleButton(query, db, ilmo)
 		if err != nil {
 			log.Printf("Error handling button press for chatId %d and button %s: %v", update.Message.Chat.ID, query.Data, err)
 		}
@@ -62,7 +62,7 @@ func handleCommand(message *tgbotapi.Message, ilmo *event.Ilmo) (tgbotapi.Messag
 }
 
 // When we get a button click, we react accordingly.
-func handleButton(query *tgbotapi.CallbackQuery, db_conn *pgx.Conn, ilmo *event.Ilmo) (tgbotapi.EditMessageTextConfig, error) {
+func handleButton(query *tgbotapi.CallbackQuery, db *database.DB, ilmo *event.Ilmo) (tgbotapi.EditMessageTextConfig, error) {
 	var text string
 	var err error
 	var markup tgbotapi.InlineKeyboardMarkup
@@ -73,13 +73,13 @@ func handleButton(query *tgbotapi.CallbackQuery, db_conn *pgx.Conn, ilmo *event.
 
 	switch buttonType {
 	case "eventInfo":
-		text, markup, err = handleEventInfo(ctx, ilmo, *query, db_conn)
+		text, markup, err = handleEventInfo(ctx, ilmo, *query, db)
 	case "Back":
 		text, markup, err = handleBackButton(ilmo, *query)
 	case "setReminder":
-		text, markup, err = handleSetReminder(ctx, ilmo, db_conn, *query, *message)
+		text, markup, err = handleSetReminder(ctx, ilmo, db, *query, *message)
 	case "removeReminder":
-		text, markup, err = handleRemoveReminder(ctx, ilmo, db_conn, *query, *message)
+		text, markup, err = handleRemoveReminder(ctx, ilmo, db, *query, *message)
 	}
 	if err != nil {
 		return tgbotapi.EditMessageTextConfig{}, err

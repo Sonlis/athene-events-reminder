@@ -1,4 +1,4 @@
-package db
+package database
 
 import (
 	"context"
@@ -17,11 +17,11 @@ func TestCreateReminder(t *testing.T) {
 	}
 	timeToInsert := time.Date(2023, 12, 8, 16, 0, 0, 0, time.UTC)
 
-	err = CreateReminder(db, context.Background(), 1, 1, timeToInsert)
+	err = db.CreateReminder(context.Background(), 1, 1, timeToInsert)
 	if err != nil {
 		t.Errorf("Failed to create reminder: %v", err)
 	}
-	reminderExists, err := CheckReminder(db, context.Background(), 1, 1)
+	reminderExists, err := db.CheckReminder(context.Background(), 1, 1)
 	if err != nil {
 		t.Errorf("Failed to check if reminder exists: %v", err)
 	}
@@ -41,16 +41,16 @@ func TestRemoveReminder(t *testing.T) {
 	}
 	timeToInsert := time.Date(2023, 12, 8, 16, 0, 0, 0, time.UTC)
 
-	err = CreateReminder(db, context.Background(), 1, 1, timeToInsert)
+	err = db.CreateReminder(context.Background(), 1, 1, timeToInsert)
 	if err != nil {
 		t.Errorf("Failed to create reminder: %v", err)
 	}
 
-	err = RemoveReminder(db, context.Background(), 1, 1)
+	err = db.RemoveReminder(context.Background(), 1, 1)
 	if err != nil {
 		t.Errorf("Failed to remove reminder: %v", err)
 	}
-	reminderExists, err := CheckReminder(db, context.Background(), 1, 1)
+	reminderExists, err := db.CheckReminder(context.Background(), 1, 1)
 	if err != nil {
 		t.Errorf("Failed to check if reminder exists: %v", err)
 	}
@@ -71,12 +71,12 @@ func TestCheckReminder(t *testing.T) {
 	}
 	timeToInsert := time.Date(2023, 12, 8, 16, 0, 0, 0, time.UTC)
 
-	err = CreateReminder(db, context.Background(), 1, 1, timeToInsert)
+	err = db.CreateReminder(context.Background(), 1, 1, timeToInsert)
 	if err != nil {
 		t.Errorf("Failed to create reminder: %v", err)
 	}
 
-	reminderExists, err := CheckReminder(db, context.Background(), 1, 1)
+	reminderExists, err := db.CheckReminder(context.Background(), 1, 1)
 	if err != nil {
 		t.Errorf("Failed to check if reminder exists: %v", err)
 	}
@@ -84,11 +84,11 @@ func TestCheckReminder(t *testing.T) {
 		t.Errorf("Reminder does not exist, but it should. Failed to create or check if the reminder exists")
 	}
 
-	err = RemoveReminder(db, context.Background(), 1, 1)
+	err = db.RemoveReminder(context.Background(), 1, 1)
 	if err != nil {
 		t.Errorf("Failed to remove reminder: %v", err)
 	}
-	reminderExists, err = CheckReminder(db, context.Background(), 1, 1)
+	reminderExists, err = db.CheckReminder(context.Background(), 1, 1)
 	if err != nil {
 		t.Errorf("Failed to check if reminder exists: %v", err)
 	}

@@ -2,8 +2,8 @@ package handle
 
 import (
 	"context"
-	"github.com/Sonlis/athene-events-notifier/internal/db"
-	"github.com/Sonlis/athene-events-notifier/internal/event"
+	"github.com/Sonlis/athene-events-reminder/internal/database"
+	"github.com/Sonlis/athene-events-reminder/internal/event"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"net/http"
 	"net/http/httptest"
@@ -33,16 +33,16 @@ func TestHandleEventInfo(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error while initializing event client: %v", err)
 	}
-	db_conf, err := db.InitTestConfig()
+	db_conf, err := database.InitTestConfig()
 	if err != nil {
 		t.Errorf("Error while initializing db client: %v", err)
 	}
 
-	db_conn, err := db.Connect(&db_conf)
+	db, err := database.Connect(&db_conf)
 	if err != nil {
 		t.Errorf("Failed to connec to db: %v", err)
 	}
-	defer db_conn.Close(ctx)
+	defer db.Close(ctx)
 	reminderTime, err := time.Parse("02.01.2006", "03.06.2021")
 	query := tgbotapi.CallbackQuery{
 		Data: "eventInfo 1",
@@ -53,12 +53,12 @@ func TestHandleEventInfo(t *testing.T) {
 			},
 		},
 	}
-	err = db.CreateReminder(db_conn, ctx, query.Message.Chat.ID, 1, reminderTime)
+	err = db.CreateReminder(ctx, query.Message.Chat.ID, 1, reminderTime)
 	if err != nil {
 		t.Errorf("Failed to create reminder: %v", err)
 	}
 
-	text, _, err := handleEventInfo(ctx, &i, query, db_conn)
+	text, _, err := handleEventInfo(ctx, &i, query, db)
 	if err != nil {
 		t.Errorf("Error testing the listing of events: %v", err)
 	}
@@ -71,11 +71,11 @@ func TestHandleEventInfo(t *testing.T) {
 		t.Errorf("Expected text: %v, got: %v", want.Text, text)
 	}
 
-	err = db.RemoveReminder(db_conn, ctx, query.Message.Chat.ID, 1)
+	err = db.RemoveReminder(ctx, query.Message.Chat.ID, 1)
 	if err != nil {
 		t.Errorf("Failed to remove reminder: %v", err)
 	}
-	text, _, err = handleEventInfo(ctx, &i, query, db_conn)
+	text, _, err = handleEventInfo(ctx, &i, query, db)
 	if err != nil {
 		t.Errorf("Error testing the listing of events: %v", err)
 	}

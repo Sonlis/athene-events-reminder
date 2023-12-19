@@ -1,4 +1,4 @@
-package db
+package database
 
 import (
 	"context"
@@ -23,16 +23,20 @@ type Config struct {
 	MaxConnIdleTime time.Duration `env:"DB_MAX_CONN_IDLE_TIME,default=0"`
 }
 
+type DB struct {
+	*pgx.Conn
+}
+
 func (c *Config) ConnString() string {
 	return fmt.Sprintf(
 		"postgres://%s:%s@%s:%d/%s",
 		c.User, string(c.Password), c.Host, c.Port, c.Name)
 }
 
-func Connect(config *Config) (*pgx.Conn, error) {
+func Connect(config *Config) (*DB, error) {
 	connectionString := config.ConnString()
 	conn, err := pgx.Connect(context.Background(), connectionString)
-	return conn, err
+	return &DB{conn}, err
 }
 
 // InitTestConfig is a helper function to init a db connection during tests.
