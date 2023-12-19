@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Sonlis/athene-events-notifier/internal/db"
-	"github.com/Sonlis/athene-events-notifier/internal/event"
+	"github.com/Sonlis/athene-events-reminder/internal/database"
+	"github.com/Sonlis/athene-events-reminder/internal/event"
 )
 
 func TestGetReminders(t *testing.T) {
@@ -19,12 +19,12 @@ func TestGetReminders(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error while initializing event client: %v", err)
 	}
-	db_conf, err := db.InitTestConfig()
+	db_conf, err := database.InitTestConfig()
 	if err != nil {
 		t.Errorf("Error while initializing db client: %v", err)
 	}
 
-	db_conn, err := db.Connect(&db_conf)
+	db_conn, err := database.Connect(&db_conf)
 	if err != nil {
 		t.Errorf("Failed to connec to db: %v", err)
 	}
@@ -34,12 +34,12 @@ func TestGetReminders(t *testing.T) {
 
 	currentTime := time.Now().Add(time.Second * 30).Add(time.Duration(-2) * time.Hour)
 
-	err = db.CreateReminder(db_conn, context.Background(), 1, 1, timeToInsert)
+	err = db_conn.CreateReminder(context.Background(), 1, 1, timeToInsert)
 	if err != nil {
 		t.Errorf("Failed to create reminder: %v", err)
 	}
 
-	err = db.CreateReminder(db_conn, context.Background(), 2, 2, currentTime)
+	err = db_conn.CreateReminder(context.Background(), 2, 2, currentTime)
 	if err != nil {
 		t.Errorf("Failed to create reminder: %v", err)
 	}

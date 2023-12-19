@@ -6,9 +6,10 @@ import (
 	"time"
 
 	"context"
-	"github.com/Sonlis/athene-events-notifier/internal/event"
+
+	"github.com/Sonlis/athene-events-reminder/internal/database"
+	"github.com/Sonlis/athene-events-reminder/internal/event"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/jackc/pgx/v5"
 )
 
 type Reminder struct {
@@ -17,7 +18,7 @@ type Reminder struct {
 	ReminderTime time.Time
 }
 
-func Notify(bot *tgbotapi.BotAPI, db *pgx.Conn, i *event.Ilmo) {
+func Notify(bot *tgbotapi.BotAPI, db *database.DB, i *event.Ilmo) {
 	ctx := context.Background()
 
 	reminders, err := getReminders(ctx, db, i)
@@ -58,7 +59,7 @@ func buildEventsDescription(reminders []Reminder, i *event.Ilmo) (map[int]string
 	return eventsDescription, nil
 }
 
-func getReminders(ctx context.Context, db *pgx.Conn, i *event.Ilmo) ([]Reminder, error) {
+func getReminders(ctx context.Context, db *database.DB, i *event.Ilmo) ([]Reminder, error) {
 	// Checks for reminders that are set to be sent in less than a minute.
 	rows, err := db.Query(ctx, "SELECT chat_id, event_id, reminder_time FROM reminder WHERE reminder_time - localtimestamp BETWEEN interval '0 minute' AND interval '1 minute'")
 	if err != nil {

@@ -1,4 +1,4 @@
-module github.com/Sonlis/athene-events-notifier
+module github.com/Sonlis/athene-events-reminder
 
 go 1.20
 

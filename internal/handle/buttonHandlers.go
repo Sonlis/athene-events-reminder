@@ -7,13 +7,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Sonlis/athene-events-notifier/internal/db"
-	"github.com/Sonlis/athene-events-notifier/internal/event"
+	"github.com/Sonlis/athene-events-reminder/internal/database"
+	"github.com/Sonlis/athene-events-reminder/internal/event"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	pgx "github.com/jackc/pgx/v5"
 )
 
-func handleEventInfo(ctx context.Context, ilmo *event.Ilmo, query tgbotapi.CallbackQuery, db_conn *pgx.Conn) (string, tgbotapi.InlineKeyboardMarkup, error) {
+func handleEventInfo(ctx context.Context, ilmo *event.Ilmo, query tgbotapi.CallbackQuery, db *database.DB) (string, tgbotapi.InlineKeyboardMarkup, error) {
 	var text string
 	var markup tgbotapi.InlineKeyboardMarkup
 	message := query.Message
@@ -23,7 +22,7 @@ func handleEventInfo(ctx context.Context, ilmo *event.Ilmo, query tgbotapi.Callb
 		return text, markup, err
 	}
 	fmt.Println(event.RegistrationStartDate)
-	reminderSet, err := db.CheckReminder(db_conn, ctx, message.Chat.ID, event.ID)
+	reminderSet, err := db.CheckReminder(ctx, message.Chat.ID, event.ID)
 	if err != nil {
 		return text, markup, err
 	}
@@ -48,7 +47,7 @@ func handleBackButton(ilmo *event.Ilmo, query tgbotapi.CallbackQuery) (string, t
 }
 
 // Set a reminder for an event, then returns the same menu but with the option to remove the reminder.
-func handleSetReminder(ctx context.Context, ilmo *event.Ilmo, db_conn *pgx.Conn, query tgbotapi.CallbackQuery, message tgbotapi.Message) (string, tgbotapi.InlineKeyboardMarkup, error) {
+func handleSetReminder(ctx context.Context, ilmo *event.Ilmo, db *database.DB, query tgbotapi.CallbackQuery, message tgbotapi.Message) (string, tgbotapi.InlineKeyboardMarkup, error) {
 	var text string
 	var markup tgbotapi.InlineKeyboardMarkup
 	eventIdStr := strings.Split(query.Data, " ")[1]
@@ -60,7 +59,7 @@ func handleSetReminder(ctx context.Context, ilmo *event.Ilmo, db_conn *pgx.Conn,
 	if err != nil {
 		return text, markup, err
 	}
-	err = db.CreateReminder(db_conn, ctx, message.Chat.ID, eventId, reminderTime)
+	err = db.CreateReminder(ctx, message.Chat.ID, eventId, reminderTime)
 	if err != nil {
 		return text, markup, err
 	}
@@ -74,7 +73,7 @@ func handleSetReminder(ctx context.Context, ilmo *event.Ilmo, db_conn *pgx.Conn,
 }
 
 // Remove a reminder for an event, then returns the same menu but with the option to set the reminder.
-func handleRemoveReminder(ctx context.Context, ilmo *event.Ilmo, db_conn *pgx.Conn, query tgbotapi.CallbackQuery, message tgbotapi.Message) (string, tgbotapi.InlineKeyboardMarkup, error) {
+func handleRemoveReminder(ctx context.Context, ilmo *event.Ilmo, db *database.DB, query tgbotapi.CallbackQuery, message tgbotapi.Message) (string, tgbotapi.InlineKeyboardMarkup, error) {
 	var text string
 	var markup tgbotapi.InlineKeyboardMarkup
 	eventIdStr := strings.Split(query.Data, " ")[1]
@@ -82,7 +81,7 @@ func handleRemoveReminder(ctx context.Context, ilmo *event.Ilmo, db_conn *pgx.Co
 	if err != nil {
 		return text, markup, err
 	}
-	err = db.RemoveReminder(db_conn, ctx, message.Chat.ID, eventId)
+	err = db.RemoveReminder(ctx, message.Chat.ID, eventId)
 	if err != nil {
 		return text, markup, err
 	}
