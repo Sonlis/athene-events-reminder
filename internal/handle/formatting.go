@@ -13,9 +13,7 @@ var backButton = "Back"
 // buildEventsMarkup builds the markup structure returned when a single event is requested.
 func buildEventInfoMarkup(event event.Event, reminderSet bool) tgbotapi.InlineKeyboardMarkup {
 	// Set the reminde to be 5 minutes before the event registration starts.
-	// Also remove 2 hours to the time, because the event is in UTC+2, while the db time is in UTC.
-	// Should be removed once the db timezone is correctly set.
-	reminderTime := event.RegistrationStartDate.Add(time.Duration(-5) * time.Minute).Add(time.Duration(-2) * time.Hour).Format("2006-01-02T15:04:05Z07:00")
+	reminderTime := event.RegistrationStartDate.Add(time.Duration(-5) * time.Minute).UTC().Format("2006-01-02T15:04:05Z07:00")
 	if reminderSet {
 		return tgbotapi.NewInlineKeyboardMarkup(
 			tgbotapi.NewInlineKeyboardRow(

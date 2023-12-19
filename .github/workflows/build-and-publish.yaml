@@ -1,0 +1,29 @@
+name: BuildAndPublish
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to publish
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20.0'
+      - name: Install dependencies
+        run: go mod tidy
+      - name: Test with the Go CLI
+        run: make test
+      - name: Build binary
+        run: go build -o server cmd/server/server.go
+      - name: Build docker image
+        run: |
+          docker buildx build --push \
+            --tag bastibast/athene-events-reminder:${{ github.event.inputs.version }} \
+            --platform linux/amd64,linux/arm/v7,linux/arm64 .
