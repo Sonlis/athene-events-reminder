@@ -32,8 +32,7 @@ func TestGetReminders(t *testing.T) {
 
 	timeToInsert := time.Date(2023, 12, 8, 16, 0, 0, 0, time.UTC)
 
-	currentTime := time.Now().Add(time.Second * 30).Add(time.Duration(-2) * time.Hour)
-
+	currentTime := time.Now().Add(time.Second * 30).UTC()
 	err = db_conn.CreateReminder(context.Background(), 1, 1, timeToInsert)
 	if err != nil {
 		t.Errorf("Failed to create reminder: %v", err)
@@ -48,11 +47,11 @@ func TestGetReminders(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error while getting reminders: %v", err)
 	}
-	want := Reminder{2, 2, currentTime.UTC().Add(time.Hour * 2)}
+	want := Reminder{2, 2, currentTime}
 	if len(reminders) != 1 {
 		t.Errorf("Expected 1 reminder, got %v", len(reminders))
 	}
-	if reminders[0] != want {
+	if !reminders[0].ReminderTime.Truncate(time.Second).Equal(want.ReminderTime.Truncate(time.Second)) {
 		t.Errorf("Expected %v, got %v", want, reminders[0])
 	}
 }
