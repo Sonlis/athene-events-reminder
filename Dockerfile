@@ -1,4 +1,4 @@
-FROM alpine:3 as packages
+FROM alpine as packages
 RUN apk --update add ca-certificates
 RUN apk add tzdata
 
