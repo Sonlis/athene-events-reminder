@@ -73,6 +73,7 @@ func getReminders(ctx context.Context, db *database.DB, i *event.Ilmo) ([]Remind
 		if err := rows.Scan(&reminder.ChatId, &reminder.EventId, &reminder.ReminderTime); err != nil {
 			return nil, err
 		}
+        reminder.ReminderTime = reminder.ReminderTime.UTC()
 		reminders = append(reminders, reminder)
 	}
 	if err := rows.Err(); err != nil {

@@ -2,7 +2,6 @@ package handle
 
 import (
 	"context"
-	"fmt"
 
 	"strconv"
 	"strings"
@@ -21,7 +20,6 @@ func handleEventInfo(ctx context.Context, ilmo *event.Ilmo, query tgbotapi.Callb
 	if err != nil {
 		return text, markup, err
 	}
-	fmt.Println(event.RegistrationStartDate)
 	reminderSet, err := db.CheckReminder(ctx, message.Chat.ID, event.ID)
 	if err != nil {
 		return text, markup, err
