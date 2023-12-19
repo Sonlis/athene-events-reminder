@@ -21,7 +21,7 @@ jobs:
       - name: Test with the Go CLI
         run: make test
       - name: Build binary
-        run: go build cmd/server/server.go -o server
+        run: go build -o server cmd/server/server.go
       - name: Build docker image
         run: |
           docker buildx build --push \
