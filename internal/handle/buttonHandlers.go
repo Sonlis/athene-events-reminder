@@ -2,13 +2,15 @@ package handle
 
 import (
 	"context"
+	"fmt"
+
+	"strconv"
+	"strings"
 
 	"github.com/Sonlis/athene-events-notifier/internal/db"
 	"github.com/Sonlis/athene-events-notifier/internal/event"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	pgx "github.com/jackc/pgx/v5"
-	"strconv"
-	"strings"
 )
 
 func handleEventInfo(ctx context.Context, ilmo *event.Ilmo, query tgbotapi.CallbackQuery, db_conn *pgx.Conn) (string, tgbotapi.InlineKeyboardMarkup, error) {
@@ -20,6 +22,7 @@ func handleEventInfo(ctx context.Context, ilmo *event.Ilmo, query tgbotapi.Callb
 	if err != nil {
 		return text, markup, err
 	}
+	fmt.Println(event.RegistrationStartDate)
 	reminderSet, err := db.CheckReminder(db_conn, ctx, message.Chat.ID, event.ID)
 	if err != nil {
 		return text, markup, err
